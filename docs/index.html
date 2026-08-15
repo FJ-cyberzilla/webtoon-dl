@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webtoon Downloader CLI v2.1.7 | FJ™ Cybertronic Systems</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #090a0f;
+            --bg-card: #12151e;
+            --bg-code: #0b0d13;
+            --purple-main: #8a2be2;
+            --purple-glow: #9d4edd;
+            --purple-light: #c77dff;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #262b3d;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, rgba(138, 43, 226, 0.1) 0%, rgba(9, 10, 15, 0.8) 100%);
+            padding: 3rem 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(138, 43, 226, 0.2);
+            color: var(--purple-light);
+            border: 1px solid var(--purple-main);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, var(--purple-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .branding-tag {
+            font-size: 0.9rem;
+            color: var(--purple-light);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 24px;
+            background: var(--purple-main);
+            border-radius: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--purple-main);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .code-block {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .cmd-prompt {
+            color: var(--purple-light);
+            user-select: none;
+        }
+
+        .diagram-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .tree {
+            font-family: monospace;
+            white-space: pre;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .tree-highlight {
+            color: var(--purple-light);
+            font-weight: bold;
+        }
+
+        .make-banner {
+            background: #000;
+            border: 1px solid var(--purple-main);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: monospace;
+            color: var(--text-main);
+            white-space: pre;
+            line-height: 1.2;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--purple-main);
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 1.8rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <span class="badge">RELEASE v2.1.7</span>
+        <h1 class="title">Webtoon Downloader CLI</h1>
+        <p class="subtitle">High-performance, parallel scraper & native PDF compiler written in Go.</p>
+        <div class="branding-tag">POWERED BY FJ™ CYBERTRONIC SYSTEMS</div>
+    </header>
+
+    <div class="container">
+        <!-- Highlights -->
+        <section class="section">
+            <h2 class="section-title">Key Capabilities</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">⚡ High Performance</div>
+                    <div class="card-desc">Worker-pool concurrency pattern downloading multiple pages simultaneously. Static binary compiled in Go with zero runtime dependencies.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🛡️ Industrial-Grade Reliability</div>
+                    <div class="card-desc">Features singleflight request deduplication, memory + disk LRU caching, atomic I/O file operations, and proactive system health probes.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🎨 Branded Terminal UI</div>
+                    <div class="card-desc">Interactive TUI powered by custom styles, color-coded logging, multi-platform selection, and real-time animation updates.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📄 Pure Go PDF Conversion</div>
+                    <div class="card-desc">Native image-to-PDF conversion built without heavy C/C++ bindings (CGO-free) for simple cross-platform deployment.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Architecture & Flow -->
+        <section class="section">
+            <h2 class="section-title">System Architecture</h2>
+            <div class="diagram-container">
+                <pre class="mermaid">
+graph TD
+    subgraph Structure [Directory Structure]
+        ROOT[webtoon-dl/]
+        CMD[cmd/webtoon-dl/]
+        PKG[pkg/]
+        PKG_CONFIG[config/]
+        PKG_SCRAPER[scraper/]
+        PKG_DOWN[downloader/ - LRU & Singleflight]
+        PKG_HTTP[httpclient/]
+        PKG_PDF[pdf/]
+        PKG_DIAG[diagnostics/]
+        PKG_CACHE[cache/ - LRU + Disk Tier]
+
+        subgraph UI_Pkg [ui/]
+            UI_LOGGER[logger.go - Logging]
+            UI_STYLES[styles.go - Theme]
+            UI_COMP[dashboard.go, integrated.go]
+        end
+
+        ROOT --> CMD
+        ROOT --> PKG
+
+        PKG --> PKG_CONFIG
+        PKG --> PKG_SCRAPER
+        PKG --> PKG_DOWN
+        PKG --> PKG_HTTP
+        PKG --> PKG_PDF
+        PKG --> PKG_DIAG
+        PKG --> PKG_CACHE
+        PKG --> UI_Pkg
+    end
+
+    subgraph Flow [Execution Flow]
+        CLI[Main CLI - Branded by FJ™] --> Config[Configuration Manager]
+        CLI --> Scraper
+        Scraper --> Downloader
+        Downloader --> PDFConverter[PDF Converter]
+        Downloader --> Cache
+        CLI --> UI_Log[UI Logger]
+        CLI --> Diagnostics
+    end
+
+    classDef dir fill:#12151e,stroke:#8a2be2,stroke-width:2px,color:#fff;
+    classDef pkg fill:#1a1d28,stroke:#3b82f6,stroke-width:1px,color:#e2e8f0;
+    classDef branding fill:#261335,stroke:#c77dff,stroke-width:2px,color:#fff;
+
+    class ROOT,CMD,PKG dir;
+    class PKG_SCRAPER,PKG_DOWN,PKG_HTTP,PKG_PDF,PKG_CONFIG,PKG_DIAG,PKG_CACHE,UI_Pkg pkg;
+    class CLI branding;
+                </pre>
+            </div>
+        </section>
+
+        <!-- Makefile Diagnostics -->
+        <section class="section">
+            <h2 class="section-title">Build & Automation System</h2>
+            <p class="card-desc" style="margin-bottom: 1rem;">The project utilizes an industrial Makefile with custom branded command output for developer operations and quality audits:</p>
+            <div class="make-banner">  WEBTOON-DL
+  ─────────────────────────────────
+  V E R S I O N  2 . 1 . 7
+  ─────────────────────────────────
+  Powered by FJ™ - Cybertronic Systems
+
+  COMMANDS
+  ─────────────────────────────────
+  build            ─ Build binary
+  clean            ─ Clean workspace
+  complexity       ─ Check complexity
+  coverage         ─ Generate test coverage
+  doctortoon       ─ Run diagnostics
+  fmt              ─ Format code
+  help             ─ Show this help menu
+  lint             ─ Run linter
+  run              ─ Run application
+  static-analysis  ─ Run all checks
+  test             ─ Run unit tests
+  tools            ─ Install dev tools
+  update           ─ Update dependencies
+
+  USAGE
+  ─────────────────────────────────
+  make &lt;command&gt;  |  make run ARGS="download 'Set It!'"</div>
+        </section>
+
+        <!-- Installation & Usage -->
+        <section class="section">
+            <h2 class="section-title">Quick Start</h2>
+            
+            <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Build from Source</h3>
+            <div class="code-block">
+                <div><span class="cmd-prompt">$</span> git clone https://github.com/FJ-cyberzilla/webtoon-dl.git</div>
+                <div><span class="cmd-prompt">$</span> cd webtoon-dl</div>
+                <div><span class="cmd-prompt">$</span> make build</div>
+                <div><span class="cmd-prompt">$</span> ./bin/webtoon-dl</div>
+            </div>
+
+            <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; margin-top: 1.5rem;">Interactive Controls</h3>
+            <div class="card">
+                <ul>
+                    <li><strong>[P]</strong> Toggle target platform (Webtoons.com / Comicland.org)</li>
+                    <li><strong>[S]</strong> Open API Settings Dashboard</li>
+                    <li><strong>[Type Title + Enter]</strong> Instant comic lookup and automated parsing</li>
+                    <li><strong>[Q] / [Ctrl+C]</strong> Safely abort operations and save session logs</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Project Structure Tree -->
+        <section class="section">
+            <h2 class="section-title">Repository Tree</h2>
+            <div class="code-block tree">
+webtoon-dl/
+├── <span class="tree-highlight">Makefile</span> (Branded build automation)
+├── cmd/
+│   └── webtoon-dl/
+│       ├── doctor_toon.go (Diagnostics tool)
+│       ├── main.go
+│       └── root.go
+└── pkg/
+    ├── <span class="tree-highlight">branding.go</span> (FJ™ Cybertronic Systems design tokens)
+    ├── cache/ (LRU + Disk cache implementation)
+    ├── config/ (.env parsing & settings)
+    ├── diagnostics/ (Health & system verification)
+    ├── downloader/ (Concurrent worker engine & singleflight)
+    ├── httpclient/ (Resilient client with retries/backoff)
+    ├── pdf/ (Pure Go PDF builder)
+    ├── scraper/ (Platform engines)
+    └── ui/ (Dashboard, styles, components)
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Built with ❤️ by <strong>FJ™ Cybertronic Systems</strong> &copy; 2026. All rights reserved.</p>
+    </footer>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                darkMode: true,
+                background: '#12151e',
+                primaryColor: '#1a1d28',
+                primaryBorderColor: '#8a2be2',
+                lineColor: '#94a3b8'
+            }
+        });
+    </script>
+</body>
+</html>
