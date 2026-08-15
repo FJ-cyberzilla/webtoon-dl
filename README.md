@@ -1,5 +1,8 @@
-# 🌐 Webtoon Downloader CLI (Powered by FJ™ Cybertronic Systems)
-
+# 🌐 Webtoon Downloader CLI 
+(Powered by FJ™ Cybertronic Systems)
+------------------------------------------
+https://fj-cyberzilla.github.io/webtoon-dl/
+------------------------------------------
 **Version:** 2.1.7
 
 A high-performance, robust, and portable CLI tool written in **Go** to fetch and download webtoons from supported sites and convert them into organized PDF files.
@@ -103,4 +106,4 @@ The project is structured for modularity and maintainability:
 
 ---
 
-*Built with ❤️ in Go by FJ™ Cybertronic Systems.*
+*Built in Go by FJ™ Cybertronic Systems.*
