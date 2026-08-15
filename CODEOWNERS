@@ -1,0 +1,27 @@
+# CODEOWNERS file
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence, @global-owner1 and @global-owner2
+# will be requested for review when someone opens a pull request.
+
+# Default owners for everything in the repo
+*       @FJ-cyberzilla
+
+# Code owners for specific directories
+/cmd/   @FJ-cyberzilla
+/pkg/   @FJ-cyberzilla
+/docs/  @FJ-cyberzilla
+
+# Package-specific owners
+/pkg/diagnostics/   @FJ-cyberzilla
+/pkg/downloader/    @FJ-cyberzilla
+/pkg/ui/            @FJ-cyberzilla
+/pkg/pdf/           @FJ-cyberzilla
+/pkg/scraper/       @FJ-cyberzilla
+
+# Configuration files
+*.go        @FJ-cyberzilla
+*.mod       @FJ-cyberzilla
+*.sum       @FJ-cyberzilla
+*.yaml      @FJ-cyberzilla
+*.yml       @FJ-cyberzilla
+Makefile    @FJ-cyberzilla

@@ -1,0 +1,53 @@
+# ============================================
+# CODEOWNERS - Webtoon Downloader
+# ============================================
+
+# Default owner for everything
+*                           @FJ-cyberzilla
+
+# ============ CORE PACKAGES ============
+
+# Diagnostics (100% test coverage)
+/pkg/diagnostics/           @FJ-cyberzilla
+
+# Downloader (multi-tier fallback)
+/pkg/downloader/            @FJ-cyberzilla
+
+# UI Dashboard
+/pkg/ui/                    @FJ-cyberzilla
+
+# PDF Compiler
+/pkg/pdf/                   @FJ-cyberzilla
+
+# Web Scraper
+/pkg/scraper/               @FJ-cyberzilla
+
+# ============ APPLICATION ENTRY ============
+
+/cmd/webtoon-dl/            @FJ-cyberzilla
+
+# ============ CONFIGURATION ============
+
+/pkg/config/                @FJ-cyberzilla
+/pkg/cache/                 @FJ-cyberzilla
+/pkg/models/                @FJ-cyberzilla
+
+# ============ DOCUMENTATION ============
+
+/docs/                      @FJ-cyberzilla
+README.md                   @FJ-cyberzilla
+MANIFEST.md                 @FJ-cyberzilla
+SECURITY.md                 @FJ-cyberzilla
+DISCLAIMER.md               @FJ-cyberzilla
+
+# ============ BUILD FILES ============
+
+Makefile                    @FJ-cyberzilla
+go.mod                      @FJ-cyberzilla
+go.sum                      @FJ-cyberzilla
+CODEOWNERS                  @FJ-cyberzilla
+
+# ============ TESTS ============
+
+*_test.go                   @FJ-cyberzilla
+*_benchmark_test.go         @FJ-cyberzilla

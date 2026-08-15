@@ -1,0 +1,52 @@
+graph TD
+    %% Directory Structure
+    subgraph Structure
+        ROOT[webtoon-dl/]
+        CMD[cmd/webtoon-dl/]
+        PKG[pkg/]
+        PKG_CONFIG[config/]
+        PKG_SCRAPER[scraper/]
+        PKG_DOWN[downloader/ - includes Singleflight]
+        PKG_HTTP[httpclient/]
+        PKG_PDF[pdf/]
+        PKG_DIAG[diagnostics/]
+        PKG_CACHE[cache/ - includes LRU + Disk Tier]
+        
+        subgraph UI_Pkg [ui/]
+            UI_LOGGER[logger.go - Logging]
+            UI_STYLES[styles.go - Theme]
+            UI_COMP[dashboard.go, integrated.go, etc.]
+        end
+
+        ROOT --> CMD
+        ROOT --> PKG
+        
+        PKG --> PKG_CONFIG
+        PKG --> PKG_SCRAPER
+        PKG --> PKG_DOWN
+        PKG --> PKG_HTTP
+        PKG --> PKG_PDF
+        PKG --> PKG_DIAG
+        PKG --> PKG_CACHE
+        PKG --> UI_Pkg
+    end
+
+    %% Functional Flow
+    subgraph Flow
+        CLI[Main CLI - Branded by FJ™] --> Config[Configuration Manager]
+        CLI --> Scraper
+        Scraper --> Downloader
+        Downloader --> PDFConverter
+        Downloader --> Cache
+        CLI --> UI_Log
+        CLI --> Diagnostics
+    end
+
+    %% Dependencies/Relations
+    classDef dir fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef pkg fill:#ccf,stroke:#333,stroke-width:2px;
+    classDef branding fill:#e6e6fa,stroke:#9370db,stroke-width:3px;
+    
+    class ROOT,CMD,PKG,LOGS dir;
+    class PKG_SCRAPER,PKG_DOWN,PKG_HTTP,PKG_PDF,PKG_UI,PKG_CONFIG,PKG_DIAG,PKG_CACHE pkg;
+    class CLI branding;

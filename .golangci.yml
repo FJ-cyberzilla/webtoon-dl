@@ -1,0 +1,26 @@
+# Enable strict but maintainable linters
+linters:
+  enable:
+    - exhaustive
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - wrapcheck
+    - revive
+    - forbidigo
+  disable-all: false
+
+linters-settings:
+  exhaustive:
+    check-generated: false
+    default-signifies-exhaustive: false
+  wrapcheck:
+    ignoreSigs:
+      - .Errorf(
+      - errors.New(
+      - errors.Unwrap(
+      - .Wrap(

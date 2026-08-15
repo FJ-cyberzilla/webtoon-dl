@@ -1,0 +1,49 @@
+# Binaries for programs and plugins
+/bin/*
+!/bin/.gitkeep
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+*.html
+coverage.*
+*.coverprofile
+profile.cov
+.coverage.out
+.coverage.downloader.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Local environment files
+.env
+
+# Logs
+/logs/*
+!/logs/.gitkeep
+*.log
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Project specific runtime outputs
+downloads/
+temp_*
+command.txt
+fix.txt
+GEMINI.md
