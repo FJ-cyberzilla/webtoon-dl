@@ -119,8 +119,22 @@ func calculateBackoff(attempt int, config RetryConfig) time.Duration {
 		wait = float64(config.MaxWait)
 	}
 
+import (
+	"crypto/rand"
+	"math"
+	"math/big"
+	"time"
+)
+
+// ...
+
 	if config.Jitter {
-		wait = rand.Float64() * wait
+		// Use crypto/rand for jitter to avoid weak PRNG usage
+		n, err := rand.Int(rand.Reader, big.NewInt(1000000))
+		if err == nil {
+			jitter := float64(n.Int64()) / 1000000.0
+			wait = jitter * wait
+		}
 	}
 
 	return time.Duration(wait)
