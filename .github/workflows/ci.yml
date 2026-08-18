@@ -69,11 +69,9 @@ jobs:
         run: go mod verify
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.64.0
-          skip-cache: true
-          install-mode: binary
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.64.0
+          $(go env GOPATH)/bin/golangci-lint run --timeout 5m
 
   # ==========================================
   # 3. MULTI-OS TEST MATRIX & COVERAGE
