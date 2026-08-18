@@ -178,7 +178,7 @@ func checkTargetHost(targetURL string) CheckResult {
 
 // 3. Audit Local File System Permissions for Output Directory
 func checkDiskPermissions(outDir string) CheckResult {
-	if err := os.MkdirAll(outDir, 0755); err != nil {
+	if err := os.MkdirAll(outDir, 0750); err != nil {
 		return CheckResult{
 			Name:    "Disk Output Permissions",
 			Passed:  false,
@@ -188,7 +188,7 @@ func checkDiskPermissions(outDir string) CheckResult {
 	}
 
 	testFile := filepath.Join(outDir, ".permission_check.tmp")
-	if err := os.WriteFile(testFile, []byte("test"), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte("test"), 0600); err != nil {
 		return CheckResult{
 			Name:    "Disk Output Permissions",
 			Passed:  false,

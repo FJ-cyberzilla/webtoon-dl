@@ -392,7 +392,7 @@ func (p *FilesystemProbe) Execute(_ context.Context) Result {
 
 	if p.writeTest {
 		testFile := filepath.Join(p.path, fmt.Sprintf(".health_%d.tmp", time.Now().UnixNano()))
-		if err := os.WriteFile(testFile, []byte("probe"), 0640); err != nil {
+		if err := os.WriteFile(testFile, []byte("probe"), 0600); err != nil {
 			return Result{
 				Check:    p.Name(),
 				Status:   StatusFailed,
