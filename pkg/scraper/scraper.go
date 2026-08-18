@@ -191,7 +191,9 @@ func (s *Scraper) executeRetryLoop(ctx context.Context, chapterURL string) (*htt
 		}
 
 		if resp != nil {
-			resp.Body.Close()
+			if err := resp.Body.Close(); err != nil {
+				log.Printf("[WARN] Failed to close response body: %v", err)
+			}
 		}
 
 		log.Printf("[WARN] Attempt %d failed (err: %v)", attempt+1, err)

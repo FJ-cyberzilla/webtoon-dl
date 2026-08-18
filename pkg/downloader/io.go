@@ -25,7 +25,9 @@ func AtomicWriteFile(path string, data io.Reader) error {
 	// Ensure cleanup of temp file on error
 	var success bool
 	defer func() {
-		tmpFile.Close()
+		if err := tmpFile.Close(); err != nil {
+			log.Printf("failed to close temp file: %v", err)
+		}
 		if !success {
 			if err := os.Remove(tmpPath); err != nil {
 				log.Printf("failed to remove temp file: %v", err)
