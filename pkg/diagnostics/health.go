@@ -407,7 +407,7 @@ func (p *FilesystemProbe) Execute(_ context.Context) Result {
 	// Check available space
 	var stat syscall.Statfs_t
 	if err := syscall.Statfs(p.path, &stat); err == nil {
-		freeMB := stat.Bavail * uint64(stat.Bsize) / 1024 / 1024
+		freeMB := uint64(stat.Bavail) * uint64(stat.Bsize) / 1024 / 1024
 		if freeMB < p.minFreeMB {
 			return Result{
 				Check:    p.Name(),

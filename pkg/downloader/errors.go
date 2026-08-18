@@ -22,7 +22,7 @@ func CheckDiskSpace(path string, requiredBytes uint64) error {
 	}
 
 	// Available blocks * size per block
-	availableBytes := stat.Bavail * uint64(stat.Bsize)
+	availableBytes := uint64(stat.Bavail) * uint64(stat.Bsize)
 	if availableBytes < requiredBytes {
 		return fmt.Errorf("%w: required %d bytes, available %d bytes", ErrNoSpace, requiredBytes, availableBytes)
 	}
