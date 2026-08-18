@@ -71,7 +71,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.58.2
+          version: v1.64.0
 
   # ==========================================
   # 3. MULTI-OS TEST MATRIX & COVERAGE
