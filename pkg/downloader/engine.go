@@ -246,9 +246,13 @@ func PackCBZ(srcDir, dstCBZ string) error {
 
 	// Ensure cleanup if rename fails
 	defer func() {
-		tempFile.Close()
+		if err := tempFile.Close(); err != nil {
+			log.Printf("failed to close temp CBZ file: %v", err)
+		}
 		if _, err := os.Stat(tempPath); err == nil {
-			os.Remove(tempPath)
+			if err := os.Remove(tempPath); err != nil {
+				log.Printf("failed to remove temp CBZ file: %v", err)
+			}
 		}
 	}()
 
@@ -261,7 +265,9 @@ func PackCBZ(srcDir, dstCBZ string) error {
 
 	for _, fileName := range files {
 		if err := addFileToZip(zipWriter, srcDir, fileName); err != nil {
-			zipWriter.Close()
+			if err := zipWriter.Close(); err != nil {
+				log.Printf("failed closing zip writer: %v", err)
+			}
 			return fmt.Errorf("failed adding file to zip: %w", err)
 		}
 	}

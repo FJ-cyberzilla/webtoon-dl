@@ -289,5 +289,7 @@ func ShowDashboard() {
 	}
 
 	output := RenderCommandCenter(stats, "Select an action from the menu below...", logs, 0)
-	os.Stdout.WriteString(output + "\n")
+	if _, err := os.Stdout.WriteString(output + "\n"); err != nil {
+		log.Printf("failed to write to stdout: %v", err)
+	}
 }
