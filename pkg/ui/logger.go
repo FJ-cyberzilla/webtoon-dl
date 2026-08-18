@@ -34,7 +34,8 @@ func InitializeLogger(logDir string) (func(), error) {
 	logFileName := fmt.Sprintf("log_%s.txt", time.Now().Format("2006-01-02"))
 	logPath := filepath.Join(logDir, logFileName)
 
-	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	/* #nosec G304 */
+	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}

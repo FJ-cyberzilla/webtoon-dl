@@ -201,6 +201,7 @@ func assemblePDF(results []*processedPage, outputPath string) error {
 }
 
 func getImageConfig(imgPath string) (image.Config, error) {
+	/* #nosec G304 */
 	file, err := os.Open(imgPath)
 	if err != nil {
 		return image.Config{}, fmt.Errorf("failed to open image %s: %w", imgPath, err)

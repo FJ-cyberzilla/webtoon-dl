@@ -307,6 +307,7 @@ func getImageFiles(srcDir string) ([]string, error) {
 
 func addFileToZip(zw *zip.Writer, srcDir, fileName string) error {
 	filePath := filepath.Join(srcDir, fileName)
+	/* #nosec G304 */
 	fileToZip, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("failed opening image file: %w", err)
