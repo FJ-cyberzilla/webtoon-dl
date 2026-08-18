@@ -72,6 +72,8 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.0
+          skip-cache: true
+          install-mode: binary
 
   # ==========================================
   # 3. MULTI-OS TEST MATRIX & COVERAGE
