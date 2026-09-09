@@ -25,8 +25,9 @@ func TestPackCBZ_Success(t *testing.T) {
 	_ = os.WriteFile(filepath.Join(srcDir, "ignore.txt"), []byte("txt"), 0644)
 
 	cbzPath := filepath.Join(tmpDir, "chapter_1.cbz")
-	if err := PackCBZ(srcDir, cbzPath); err != nil {
-		t.Fatalf("PackCBZ failed: %v", err)
+	archiver := &CBZArchiver{}
+	if err := archiver.Archive(srcDir, cbzPath); err != nil {
+		t.Fatalf("Archiver.Archive failed: %v", err)
 	}
 
 	// Verify zip contents
@@ -74,7 +75,7 @@ func TestEngine_DownloadChapterPages_EndToEnd(t *testing.T) {
 	}))
 	defer server.Close()
 
-	engine := NewEngine(2, true, false)
+	engine := NewEngine(2, true, false, nil, nil)
 	engine.Client = server.Client()
 
 	tmpDir := t.TempDir()
@@ -106,7 +107,7 @@ func TestEngine_DownloadChapterPages_NoImagesFound(t *testing.T) {
 	}))
 	defer server.Close()
 
-	engine := NewEngine(1, false, true)
+	engine := NewEngine(1, false, true, nil, nil)
 	engine.Client = server.Client()
 
 	tmpDir := t.TempDir()

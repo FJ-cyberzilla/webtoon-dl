@@ -57,6 +57,7 @@ func NewClient(userAgent string, timeout time.Duration, maxRedirects int) *http.
 				}).DialContext,
 				ForceAttemptHTTP2:     true,
 				MaxIdleConns:          100,
+				MaxIdleConnsPerHost:   100, // Increase connection pool per host for concurrency
 				IdleConnTimeout:       90 * time.Second,
 				TLSHandshakeTimeout:   10 * time.Second,
 				ExpectContinueTimeout: 1 * time.Second,

@@ -2,9 +2,10 @@ package downloader
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/big"
 	"net/http"
 	"strings"
 	"time"
@@ -118,15 +119,6 @@ func calculateBackoff(attempt int, config RetryConfig) time.Duration {
 	if wait > float64(config.MaxWait) {
 		wait = float64(config.MaxWait)
 	}
-
-import (
-	"crypto/rand"
-	"math"
-	"math/big"
-	"time"
-)
-
-// ...
 
 	if config.Jitter {
 		// Use crypto/rand for jitter to avoid weak PRNG usage

@@ -1,19 +1,16 @@
 package downloader
 
 import (
-	"archive/zip"
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
-	"strings"
 	"sync"
+	"time"
 
-	"github.com/PuerkitoBio/goquery"
+	"github.com/FJ-cyberzilla/webtoon-dl/pkg/httpclient"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -32,15 +29,26 @@ type Engine struct {
 	Client    *http.Client
 	CreateCBZ bool // Config flag: compile to .cbz
 	KeepRaw   bool // Config flag: keep uncompressed images after .cbz creation
+	Fetcher   Fetcher
+	Archiver  Archiver
 	sf        singleflight.Group
 }
 
-func NewEngine(workers int, createCBZ bool, keepRaw bool) *Engine {
+func NewEngine(workers int, createCBZ bool, keepRaw bool, fetcher Fetcher, archiver Archiver) *Engine {
+	client := httpclient.NewClient("", 45*time.Second, 10)
+	if fetcher == nil {
+		fetcher = &WebFetcher{Client: client}
+	}
+	if archiver == nil {
+		archiver = &CBZArchiver{}
+	}
 	return &Engine{
 		Workers:   workers,
-		Client:    &http.Client{},
+		Client:    client,
 		CreateCBZ: createCBZ,
 		KeepRaw:   keepRaw,
+		Fetcher:   fetcher,
+		Archiver:  archiver,
 	}
 }
 
@@ -63,7 +71,7 @@ func (e *Engine) DownloadChapterPages(ctx context.Context, chapterURL, chapterTi
 
 	chapterDir := filepath.Join(baseOutDir, cleanTitle)
 
-	tasks, err := e.extractImageTasks(ctx, chapterURL, chapterTitle, chapterDir)
+	tasks, err := e.Fetcher.ExtractImageTasks(ctx, chapterURL, chapterTitle, chapterDir)
 	if err != nil {
 		return err
 	}
@@ -89,63 +97,11 @@ func (e *Engine) isSkippable(cbzPath, title string) bool {
 	return false
 }
 
-func (e *Engine) extractImageTasks(ctx context.Context, chapterURL, chapterTitle, chapterDir string) ([]DownloadTask, error) {
-	doc, err := e.fetchChapterDoc(ctx, chapterURL)
-	if err != nil {
-		return nil, err
-	}
-
-	var tasks []DownloadTask
-	doc.Find("#_imageList img").Each(func(i int, sel *goquery.Selection) {
-		imgURL, exists := sel.Attr("data-url")
-		if !exists {
-			imgURL, _ = sel.Attr("src")
-		}
-
-		if imgURL != "" {
-			tasks = append(tasks, DownloadTask{
-				ChapterTitle: chapterTitle,
-				PageNum:      i + 1,
-				ImageURL:     imgURL,
-				Referer:      chapterURL,
-				OutputDir:    chapterDir,
-			})
-		}
-	})
-
-	if len(tasks) == 0 {
-		return nil, fmt.Errorf("no images found for chapter: %s", chapterTitle)
-	}
-	return tasks, nil
-}
-
-func (e *Engine) fetchChapterDoc(ctx context.Context, chapterURL string) (*goquery.Document, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", chapterURL, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed creating request: %w", err)
-	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-
-	resp, err := e.Client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed fetching chapter page: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP %d fetching chapter page", resp.StatusCode)
-	}
-
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create goquery document: %w", err)
-	}
-	return doc, nil
-}
+// Remaining methods...
 
 func (e *Engine) finalizeChapter(chapterDir, cbzPath string) error {
 	if e.CreateCBZ {
-		if err := PackCBZ(chapterDir, cbzPath); err != nil {
+		if err := e.Archiver.Archive(chapterDir, cbzPath); err != nil {
 			return fmt.Errorf("failed creating CBZ archive: %w", err)
 		}
 
@@ -213,7 +169,6 @@ func (e *Engine) downloadImage(ctx context.Context, task DownloadTask) error {
 		if err != nil {
 			return nil, fmt.Errorf("failed creating image request: %w", err)
 		}
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 		req.Header.Set("Referer", task.Referer)
 
 		resp, err := e.Client.Do(req)
@@ -231,97 +186,6 @@ func (e *Engine) downloadImage(ctx context.Context, task DownloadTask) error {
 
 	if err != nil {
 		return fmt.Errorf("singleflight download failed: %w", err)
-	}
-	return nil
-}
-
-// PackCBZ bundles all images in srcDir into a .cbz archive at dstCBZ.
-func PackCBZ(srcDir, dstCBZ string) error {
-	// Create temp file in same directory
-	tempFile, err := os.CreateTemp(filepath.Dir(dstCBZ), ".tmp-cbz-*")
-	if err != nil {
-		return fmt.Errorf("failed creating temp CBZ file: %w", err)
-	}
-	tempPath := tempFile.Name()
-
-	// Ensure cleanup if rename fails
-	defer func() {
-		if err := tempFile.Close(); err != nil {
-			log.Printf("failed to close temp CBZ file: %v", err)
-		}
-		if _, err := os.Stat(tempPath); err == nil {
-			if err := os.Remove(tempPath); err != nil {
-				log.Printf("failed to remove temp CBZ file: %v", err)
-			}
-		}
-	}()
-
-	zipWriter := zip.NewWriter(tempFile)
-
-	files, err := getImageFiles(srcDir)
-	if err != nil {
-		return err
-	}
-
-	for _, fileName := range files {
-		if err := addFileToZip(zipWriter, srcDir, fileName); err != nil {
-			if err := zipWriter.Close(); err != nil {
-				log.Printf("failed closing zip writer: %v", err)
-			}
-			return fmt.Errorf("failed adding file to zip: %w", err)
-		}
-	}
-
-	if err := zipWriter.Close(); err != nil {
-		return fmt.Errorf("failed closing zip writer: %w", err)
-	}
-
-	// Sync to disk
-	if err := tempFile.Sync(); err != nil {
-		return fmt.Errorf("failed syncing CBZ file: %w", err)
-	}
-	tempFile.Close()
-
-	// Rename atomically
-	if err := os.Rename(tempPath, dstCBZ); err != nil {
-		return fmt.Errorf("failed renaming temp CBZ file: %w", err)
-	}
-	return nil
-}
-
-func getImageFiles(srcDir string) ([]string, error) {
-	entries, err := os.ReadDir(srcDir)
-	if err != nil {
-		return nil, fmt.Errorf("failed reading source directory: %w", err)
-	}
-
-	var files []string
-	for _, entry := range entries {
-		if !entry.IsDir() && (strings.HasSuffix(entry.Name(), ".jpg") || strings.HasSuffix(entry.Name(), ".png")) {
-			files = append(files, entry.Name())
-		}
-	}
-	sort.Strings(files)
-	return files, nil
-}
-
-func addFileToZip(zw *zip.Writer, srcDir, fileName string) error {
-	filePath := filepath.Join(srcDir, fileName)
-	/* #nosec G304 */
-	fileToZip, err := os.Open(filePath)
-	if err != nil {
-		return fmt.Errorf("failed opening image file: %w", err)
-	}
-	defer fileToZip.Close()
-
-	writer, err := zw.Create(fileName)
-	if err != nil {
-		return fmt.Errorf("failed creating zip entry: %w", err)
-	}
-
-	_, err = io.Copy(writer, fileToZip)
-	if err != nil {
-		return fmt.Errorf("failed copying image to zip: %w", err)
 	}
 	return nil
 }
